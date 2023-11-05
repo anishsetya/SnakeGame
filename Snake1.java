@@ -9,11 +9,18 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import javafx.scene.input.KeyEvent;
 
+
+class SnakeCollisionException extends RuntimeException {
+    public SnakeCollisionException(String message) {
+        super(message);
+    }
+}
+
 public class Snake1 extends Application {
 
     private static final int BLOCK_SIZE = 20;
-    private static final int APP_W = 20 * BLOCK_SIZE;
-    private static final int APP_H = 15 * BLOCK_SIZE;
+    private static final int APP_W = 30 * BLOCK_SIZE;
+    private static final int APP_H = 20 * BLOCK_SIZE;
 
     private Direction direction = Direction.RIGHT;
     private boolean moved = false;
@@ -23,7 +30,7 @@ public class Snake1 extends Application {
     private Rectangle food;
 
     private Pane root;
-
+    
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
     }
@@ -83,7 +90,7 @@ public class Snake1 extends Application {
             while (running) {
                 Platform.runLater(this::update);
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -110,7 +117,6 @@ public class Snake1 extends Application {
             }
 
             checkCollision();
-            checkFood();
         }
     }
 
@@ -120,14 +126,24 @@ public class Snake1 extends Application {
         head.setTranslateY(snake.getFirst().getTranslateY() + dy);
 
         moved = true;
-
+        try{
+        if (head.getTranslateX() < 0 || head.getTranslateY() < 0 || head.getTranslateX() >= APP_W || head.getTranslateY() >= APP_H ||
+             snake.stream().anyMatch(b -> b.getTranslateX() == head.getTranslateX() && b.getTranslateY() == head.getTranslateY())) {
+                throw new SnakeCollisionException("Snake collided with boundaries or itself!");
+        }
+        }
+        catch(SnakeCollisionException exec){
+            gameOver();
+            return;
+        }
+        /*
         if (head.getTranslateX() < 0 || head.getTranslateY() < 0 ||
                 head.getTranslateX() >= APP_W || head.getTranslateY() >= APP_H ||
                 snake.stream().anyMatch(b -> b.getTranslateX() == head.getTranslateX() && b.getTranslateY() == head.getTranslateY())) {
             gameOver();
             return;
         }
-
+        */
         snake.addFirst(head);
         root.getChildren().add(head);
 
@@ -148,19 +164,7 @@ public class Snake1 extends Application {
 
             snake.addLast(tail);
             root.getChildren().add(tail);
-        }
-    }
-
-    private void checkFood() {
-        if (food.getTranslateX() == snake.getFirst().getTranslateX() && food.getTranslateY() == snake.getFirst().getTranslateY()) {
-            food.setTranslateX((int) (Math.random() * (APP_W - BLOCK_SIZE)) / BLOCK_SIZE * BLOCK_SIZE);
-            food.setTranslateY((int) (Math.random() * (APP_H - BLOCK_SIZE)) / BLOCK_SIZE * BLOCK_SIZE);
-
-            Rectangle tail = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
-            tail.setTranslateX(-BLOCK_SIZE);
-            tail.setTranslateY(-BLOCK_SIZE);
-            snake.addLast(tail);
-            root.getChildren().add(tail);
+            System.out.println("food eaten 1");
         }
     }
 
