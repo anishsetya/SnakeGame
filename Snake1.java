@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import javafx.scene.input.KeyEvent;
+import mypack.HS;
 
 
 class SnakeCollisionException extends RuntimeException {
@@ -21,6 +22,7 @@ class SnakeCollisionException extends RuntimeException {
 }
 
 public class Snake1 extends Application {
+    HS h=new HS();
     private int score=0;
     private static final int BLOCK_SIZE = 20;
     private static final int APP_W = 30 * BLOCK_SIZE;
@@ -165,16 +167,15 @@ public class Snake1 extends Application {
     }
 
     private void gameOver() {
+        if(score>h.hs){
+            h.set(score);
+        }
         stopGame();
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Game Over");
         alert.setHeaderText(null);
-        alert.setContentText("Game Over!\nScore: " + score);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("highscore.txt", true))) {
-            writer.write(score);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        alert.setContentText("Game Over!\nScore: " + score + "\n High Score: "+h.hs);
+
         // Add a custom button to the alert for further actions
         ButtonType restartButton = new ButtonType("Restart");
         alert.getButtonTypes().setAll(restartButton, ButtonType.OK);
