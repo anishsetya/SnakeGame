@@ -2,6 +2,10 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -136,14 +140,6 @@ public class Snake1 extends Application {
             gameOver();
             return;
         }
-        /*
-        if (head.getTranslateX() < 0 || head.getTranslateY() < 0 ||
-                head.getTranslateX() >= APP_W || head.getTranslateY() >= APP_H ||
-                snake.stream().anyMatch(b -> b.getTranslateX() == head.getTranslateX() && b.getTranslateY() == head.getTranslateY())) {
-            gameOver();
-            return;
-        }
-        */
         snake.addFirst(head);
         root.getChildren().add(head);
 
@@ -170,8 +166,47 @@ public class Snake1 extends Application {
 
     private void gameOver() {
         stopGame();
-        System.out.println("Game Over");
-        // You can add more game over logic here
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Game Over");
+        alert.setHeaderText(null);
+        alert.setContentText("Game Over!");
+
+        // Add a custom button to the alert for further actions
+        ButtonType restartButton = new ButtonType("Restart");
+        alert.getButtonTypes().setAll(restartButton, ButtonType.OK);
+
+        // Show the alert and wait for user action
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == restartButton) {
+                // Handle restart logic here
+                System.out.println("lawl");
+                restartGame();
+            }
+        });
+    }
+    private void restartGame() {
+        snake.clear(); // Clear the snake
+        root.getChildren().clear(); // Clear all nodes from the scene
+        initializeSnake(); // Reinitialize the snake
+        initializeFood(); // Reinitialize the food
+        startGame(); // Start the game again
+    }
+
+    private void initializeSnake() {
+        Rectangle head = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
+        head.setFill(Color.GREEN);
+        snake.add(head);
+        root.getChildren().add(head);
+        direction = Direction.RIGHT;
+        Platform.runLater(this::update);
+    }
+
+    private void initializeFood() {
+        food = new Rectangle(BLOCK_SIZE, BLOCK_SIZE);
+        food.setFill(Color.RED);
+        food.setTranslateX((int) (Math.random() * (APP_W - BLOCK_SIZE)) / BLOCK_SIZE * BLOCK_SIZE);
+        food.setTranslateY((int) (Math.random() * (APP_H - BLOCK_SIZE)) / BLOCK_SIZE * BLOCK_SIZE);
+        root.getChildren().add(food);
     }
 
     private void stopGame() {
