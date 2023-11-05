@@ -21,7 +21,7 @@ class SnakeCollisionException extends RuntimeException {
 }
 
 public class Snake1 extends Application {
-
+    private int score=0;
     private static final int BLOCK_SIZE = 20;
     private static final int APP_W = 30 * BLOCK_SIZE;
     private static final int APP_H = 20 * BLOCK_SIZE;
@@ -94,7 +94,7 @@ public class Snake1 extends Application {
             while (running) {
                 Platform.runLater(this::update);
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(200-score*10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -160,7 +160,7 @@ public class Snake1 extends Application {
 
             snake.addLast(tail);
             root.getChildren().add(tail);
-            System.out.println("food eaten 1");
+            score++;
         }
     }
 
@@ -169,8 +169,12 @@ public class Snake1 extends Application {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Game Over");
         alert.setHeaderText(null);
-        alert.setContentText("Game Over!");
-
+        alert.setContentText("Game Over!\nScore: " + score);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("highscore.txt", true))) {
+            writer.write(score);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // Add a custom button to the alert for further actions
         ButtonType restartButton = new ButtonType("Restart");
         alert.getButtonTypes().setAll(restartButton, ButtonType.OK);
@@ -179,12 +183,12 @@ public class Snake1 extends Application {
         alert.showAndWait().ifPresent(buttonType -> {
             if (buttonType == restartButton) {
                 // Handle restart logic here
-                System.out.println("lawl");
                 restartGame();
             }
         });
     }
     private void restartGame() {
+        score=0;
         snake.clear(); // Clear the snake
         root.getChildren().clear(); // Clear all nodes from the scene
         initializeSnake(); // Reinitialize the snake
