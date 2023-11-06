@@ -9,6 +9,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import javafx.scene.input.KeyEvent;
@@ -20,6 +22,7 @@ class SnakeCollisionException extends RuntimeException {
         super(message);
     }
 }
+
 
 public class Snake1 extends Application {
     HS h=new HS();
@@ -178,15 +181,20 @@ public class Snake1 extends Application {
 
         // Add a custom button to the alert for further actions
         ButtonType restartButton = new ButtonType("Restart");
-        alert.getButtonTypes().setAll(restartButton, ButtonType.OK);
+        ButtonType exitButtonType = new ButtonType("Exit", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(restartButton, exitButtonType);
 
         // Show the alert and wait for user action
         alert.showAndWait().ifPresent(buttonType -> {
             if (buttonType == restartButton) {
                 // Handle restart logic here
                 restartGame();
+            } else if (buttonType == exitButtonType) {
+                // Close the application window
+                exitGame();
             }
         });
+
     }
     private void restartGame() {
         score=0;
@@ -217,7 +225,10 @@ public class Snake1 extends Application {
     private void stopGame() {
         running = false;
     }
-
+    private void exitGame() {
+        Platform.exit();
+        System.exit(0);
+    }
     public static void main(String[] args) {
         launch(args);
     }
