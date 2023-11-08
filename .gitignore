@@ -1,2 +1,2 @@
-# *.class
-# !mypack/HS.class
+*.class
+!mypack/HS.class
